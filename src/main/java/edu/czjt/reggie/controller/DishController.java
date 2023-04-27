@@ -9,9 +9,11 @@ import edu.czjt.reggie.entity.DishFlavor;
 import edu.czjt.reggie.service.CategoryService;
 import edu.czjt.reggie.service.DishFlavorService;
 import edu.czjt.reggie.service.DishService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/dish")
+@Slf4j
 public class DishController {
     @Autowired
     private DishService dishService;
@@ -60,5 +63,12 @@ public class DishController {
         }).collect(Collectors.toList());
 
         return R.success(dishDtos);
+    }
+
+    @GetMapping("/{id}")
+    public R<DishDto> get(@PathVariable Long id) {
+        log.debug("通过ID：{} 获取菜品", id);
+        DishDto dishDto = dishService.getByIdWithFlavor(id);
+        return R.success(dishDto);
     }
 }
