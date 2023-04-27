@@ -9,4 +9,6 @@ import edu.czjt.reggie.entity.Dish;
  */
 public interface DishService extends IService<Dish> {
     public DishDto getByIdWithFlavor(Long id);
+
+    public void saveWithFlavor(DishDto dishDto);
 }

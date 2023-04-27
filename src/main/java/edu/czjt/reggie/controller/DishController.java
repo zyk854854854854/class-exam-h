@@ -1,6 +1,7 @@
 package edu.czjt.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import edu.czjt.reggie.common.R;
 import edu.czjt.reggie.dto.DishDto;
@@ -13,11 +14,10 @@ import edu.czjt.reggie.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,7 +88,7 @@ public class DishController {
         dishService.page(dishPage, dishLambdaQueryWrapper);
 
         // 将分页信息拷贝到dishDtoPage
-        BeanUtils.copyProperties(dishPage,dishDtoPage,"records");
+        BeanUtils.copyProperties(dishPage, dishDtoPage, "records");
 
         // 将dishPage的record转为dishDtoPage的record
         List<Dish> records = dishPage.getRecords();
@@ -104,6 +104,7 @@ public class DishController {
 
     /**
      * 将dish转化为dishDto
+     *
      * @param dish
      * @return
      */
@@ -124,4 +125,46 @@ public class DishController {
 
         return dishDto;
     }
+
+    @PostMapping()
+    public R<String> save(@RequestBody DishDto dishDto) {
+        log.debug("保存dish: {}", dishDto.toString());
+
+        dishService.saveWithFlavor(dishDto);
+
+        return R.success("新增菜品成功");
+    }
+
+    @PutMapping("/status/{status}")
+    public R<String> status(@PathVariable("status") Integer status, @RequestBody String ids) {
+        log.debug("修改菜品ids:{} 的状态为：{}。", ids, status);
+
+        List<Long> idList = Arrays.stream(ids.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+
+        UpdateWrapper<Dish> dishUpdateWrapper = new UpdateWrapper<>();
+        dishUpdateWrapper.in("id", idList).set("status", status);
+
+        dishService.update(dishUpdateWrapper);
+        return R.success("更新成功");
+    }
+
+    @PutMapping()
+    @Transactional
+    public R<String> update(@RequestBody DishDto dishDto) {
+        log.debug("更新dishDto:{}", dishDto.toString());
+
+        dishService.updateById(dishDto);
+
+        List<DishFlavor> dishFlavors = dishDto.getFlavors().stream().map((item) -> {
+            item.setDishId(dishDto.getId());
+            return item;
+        }).collect(Collectors.toList());
+
+        dishFlavorService.updateBatchById(dishFlavors);
+
+        return R.success("更新成功");
+    }
+
 }

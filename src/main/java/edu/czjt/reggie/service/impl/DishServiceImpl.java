@@ -10,8 +10,10 @@ import edu.czjt.reggie.service.DishService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by jinkun.tian on 2023/4/27
@@ -35,5 +37,23 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             dishDto.setFlavors(flavors);
         }
         return dishDto;
+    }
+
+    @Transactional
+    public void saveWithFlavor(DishDto dishDto) {
+        // 保存菜品的基本信息到菜品表dish
+        this.save(dishDto);
+
+        Long dishId = dishDto.getId();
+
+        List<DishFlavor> flavors = dishDto.getFlavors();
+
+        flavors = flavors.stream().map((item) -> {
+            item.setDishId(dishId);
+            return item;
+        }).collect(Collectors.toList());
+
+        dishFlavorService.saveBatch(flavors);
+
     }
 }
