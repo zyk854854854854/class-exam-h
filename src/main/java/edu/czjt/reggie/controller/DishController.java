@@ -1,6 +1,7 @@
 package edu.czjt.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import edu.czjt.reggie.common.R;
 import edu.czjt.reggie.dto.DishDto;
 import edu.czjt.reggie.entity.Category;
@@ -70,5 +71,57 @@ public class DishController {
         log.debug("通过ID：{} 获取菜品", id);
         DishDto dishDto = dishService.getByIdWithFlavor(id);
         return R.success(dishDto);
+    }
+
+    @GetMapping("/page")
+    public R<Page> page(int page, int pageSize, String name) {
+        // 构建分页构造器对象
+        Page<Dish> dishPage = new Page<>(page, pageSize);
+        Page<DishDto> dishDtoPage = new Page<>(page, pageSize);
+
+        // 条件构造器
+        LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        dishLambdaQueryWrapper.like(name != null, Dish::getName, name);
+        dishLambdaQueryWrapper.orderByDesc(Dish::getUpdateTime);
+
+        // 分页查询
+        dishService.page(dishPage, dishLambdaQueryWrapper);
+
+        // 将分页信息拷贝到dishDtoPage
+        BeanUtils.copyProperties(dishPage,dishDtoPage,"records");
+
+        // 将dishPage的record转为dishDtoPage的record
+        List<Dish> records = dishPage.getRecords();
+
+        List<DishDto> dishDtoList = records.stream().map((item) -> {
+            return dish2dishDto(item);
+        }).collect(Collectors.toList());
+
+        dishDtoPage.setRecords(dishDtoList);
+
+        return R.success(dishDtoPage);
+    }
+
+    /**
+     * 将dish转化为dishDto
+     * @param dish
+     * @return
+     */
+    private DishDto dish2dishDto(Dish dish) {
+        DishDto dishDto = new DishDto();
+
+        BeanUtils.copyProperties(dish, dishDto);
+
+        Category category = categoryService.getById(dish.getCategoryId());
+
+        if (category != null) {
+            dishDto.setCategoryName(category.getName());
+        }
+
+        List<DishFlavor> dishFlavors = dishFlavorService.getFlavorsByDishId(dish.getId());
+
+        dishDto.setFlavors(dishFlavors);
+
+        return dishDto;
     }
 }
