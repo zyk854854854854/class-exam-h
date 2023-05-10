@@ -11,4 +11,6 @@ import java.util.List;
 public interface DishFlavorService extends IService<DishFlavor> {
 
     public List<DishFlavor> getFlavorsByDishId(Long dishId);
+
+    boolean removeByDishId(Long id);
 }

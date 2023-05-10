@@ -167,4 +167,18 @@ public class DishController {
         return R.success("更新成功");
     }
 
+    @DeleteMapping()
+    public R<String> delete(@RequestParam("ids") String ids) {
+        log.info("删除菜名ids：{}", ids);
+        List<Long> idList = Arrays.stream(ids.split(","))
+                .map(item->{
+                    Long id = Long.valueOf(item);
+                    dishFlavorService.removeByDishId(id);
+                    dishService.removeById(id);
+                    return id;
+                })
+                .collect(Collectors.toList());
+        return R.success("删除菜品成功。");
+    }
+
 }

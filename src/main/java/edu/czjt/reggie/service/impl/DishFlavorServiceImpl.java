@@ -20,4 +20,11 @@ public class DishFlavorServiceImpl extends ServiceImpl<DishFlavorMapper, DishFla
         dishFlavorLambdaQueryWrapper.eq(DishFlavor::getDishId, dishId);
         return this.list(dishFlavorLambdaQueryWrapper);
     }
+
+    @Override
+    public boolean removeByDishId(Long dishId) {
+        LambdaQueryWrapper<DishFlavor> dishFlavorLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        dishFlavorLambdaQueryWrapper.eq(DishFlavor::getDishId, dishId);
+        return this.remove(dishFlavorLambdaQueryWrapper);
+    }
 }
