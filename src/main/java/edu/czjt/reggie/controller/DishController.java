@@ -157,17 +157,23 @@ public class DishController {
 
         dishService.updateById(dishDto);
 
+        // 按照dishid删除dishflavor
+        dishFlavorService.removeByDishId(dishDto.getId());
+
         List<DishFlavor> dishFlavors = dishDto.getFlavors().stream().map((item) -> {
             item.setDishId(dishDto.getId());
             return item;
         }).collect(Collectors.toList());
 
-        dishFlavorService.updateBatchById(dishFlavors);
+        dishFlavorService.saveBatch(dishFlavors);
+
+        // dishFlavorService.updateBatchById(dishFlavors);
 
         return R.success("更新成功");
     }
 
     @DeleteMapping()
+    @Transactional
     public R<String> delete(@RequestParam("ids") String ids) {
         log.info("删除菜名ids：{}", ids);
         List<Long> idList = Arrays.stream(ids.split(","))

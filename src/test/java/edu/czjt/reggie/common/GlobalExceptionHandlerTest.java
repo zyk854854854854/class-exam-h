@@ -28,9 +28,6 @@ class GlobalExceptionHandlerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private GlobalExceptionHandler handler;
-
     @Test
     public void testExceptionHandler() throws Exception {
 
