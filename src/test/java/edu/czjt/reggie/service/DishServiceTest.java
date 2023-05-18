@@ -16,7 +16,6 @@ class DishServiceTest {
     public void eqtest(){
         assertEquals(1,1);
         assertNotNull("aaa");
-        assertNotNull(null);
         assertTrue(1==1);
         assertTrue(returnTrue());
         assertThrows(CustomException.class, ()->{

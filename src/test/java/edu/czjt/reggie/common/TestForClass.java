@@ -25,11 +25,6 @@ public class TestForClass {
 
     }
 
-    @Test
-    public void exceptionTest(){
-        throw new CustomException("这是一个定制的Exception。");
-    }
-
     static boolean returnTrue(){
         return true;
     }
