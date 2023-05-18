@@ -12,8 +12,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
-import java.time.LocalDateTime;
 
 /**
  * Created by jinkun.tian on 2023/3/16
@@ -58,7 +56,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/page")
-    public Page page(int page, int pageSize, String name) {
+    public R<Page> page(int page, int pageSize, String name) {
         log.info("page = {},pageSize = {},name = {}", page, pageSize, name);
         Page pageInfo = new Page(page, pageSize);
 
@@ -70,7 +68,7 @@ public class EmployeeController {
 
         employeeService.page(pageInfo, queryWrapper);
 
-        return pageInfo;
+        return R.success(pageInfo);
     }
 
     @PostMapping("/logout")
