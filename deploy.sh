@@ -2,6 +2,7 @@
 
 # 1. 下载代码
 echo "正在下载代码..."
+if [ -d tmpdir ]; then rm -rf tmpdir; fi
 mkdir -p tmpdir
 cd tmpdir
 git clone https://gitee.com/tjk1898/reggie-class-demo.git
@@ -30,6 +31,7 @@ echo "远程目录清空完成."
 echo "将Jar和start.sh发送到远端目录..."
 scp -r ${LOCAL_JAR_FILE} ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/
 scp -r ${LOCAL_START_SHELL} ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}/
+ssh ${REMOTE_USER}@${REMOTE_HOST} "chmod +x ${REMOTE_PATH}/start.sh"
 echo "内容已发送到远端目录."
 
 # 4. 运行jar

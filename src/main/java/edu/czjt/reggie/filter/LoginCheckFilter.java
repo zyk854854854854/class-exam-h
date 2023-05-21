@@ -36,7 +36,11 @@ public class LoginCheckFilter implements Filter {
         // 不需要验证的url
         String[] urls = new String[]{
                 "/employee/login",
-                "/employee/logout"
+                "/employee/logout",
+                "/doc.html",
+                "/webjars/**",
+                "/swagger-resources",
+                "/v2/api-docs"
         };
         boolean check = check(urls, requestURI);
 
